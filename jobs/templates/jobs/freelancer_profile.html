@@ -1,0 +1,88 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+	<title>My Profile</title>
+  <link rel="icon" href="{% static 'jobs/media/logo.png' %}" type="image/icon type">
+	<link rel="stylesheet" type="text/css" href="{% static 'jobs/css/freelancer.css' %}">
+</head>
+<body>
+    <div class="header">
+      <div style="padding-left: 2%;"><a class="text-light" href="{% url 'home' %}" style="text-decoration: none; color: aliceblue;">Home</a></div>
+      <div style="width: 14%;">
+        <div style="float: left;"><a style="color: black; background-color: white;" class="fcc-btn" href="{% url 'freelancer-report' freelancer.id %}">Report</a></div>
+        <div style="float: right;"><a class="fcc-btn" href="{% url 'update-freelancer' %}">Update Profile</a></div>
+      </div>
+
+    </div>
+
+    <div class="profile-container">
+      <div class="profile-section">
+        <h2>Profile Picture</h2>
+        {% if freelancer.profile_pic %}
+        <img src="{{ freelancer.profile_pic.url }}" alt="Profile Picture" class="profile-picture">
+        {% else %}
+        <img src="{% static 'jobs/media/profile_pic.png' %}" alt="Profile Picture" class="profile-picture">
+        {% endif %}
+      </div>
+      <div class="profile-section">
+        <h2>Username</h2>
+        <p>{{ freelancer.name }}</p>
+      </div>
+      <div class="profile-section">
+        <h2>E-mail: </h2>
+        <p>{{ user.email }}</p>
+      </div>
+      <div class="profile-section">
+        <h2>My Score</h2>
+        <div class="star-rating">
+          <span class="fa fa-star checked"></span>
+          <span class="fa fa-star checked"></span>
+          <span class="fa fa-star checked"></span>
+          <span class="fa fa-star"></span>
+          <span class="fa fa-star"></span>
+        </div>
+        <p> {{ freelancer.rate }} </p>
+      </div>
+      <div class="profile-section">
+        <h2>Projects</h2>
+        {% if projects|length > 3 %}
+          <p>{{ projects|length }}</p>
+        {% elif projects|length == 0%}
+          <p>0</p>
+        {% else %}
+          {% for project in projects %}
+            {% if project.is_complete %}
+              <p> {{ project.name }} | completed </p>
+            {% else %}
+              <p> {{ project.name }} | in progress </p>
+            {% endif %}
+          {% endfor %}
+        {% endif  %}
+      </div>
+      <div class="profile-section">
+        <h2>Join Date</h2>
+        <p>{{ freelancer.joinedDate|date }}</p>
+      </div>
+      <div class="profile-section">
+        <h2>Skills</h2>
+        <p> {{ freelancer.skills }} </p>
+      </div>
+      <div class="profile-section">
+        <h2>About Me</h2>
+        <p>{{freelancer.about}}</p>
+      </div>
+      <!-- <div class="profile-section">
+        <h2>Certifications</h2>
+        <p>{{ freelancer.certifications}}</p>
+      </div> -->
+
+      <!-- <div class="profile-section">
+        <button class="invite-button">Invite Friends</button>
+      </div>
+      <div class="profile-section">
+        <button class="my-dashboard">My Dashboard</button>
+      </div> -->
+    </div>
+  </body>
+  

@@ -1,0 +1,78 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Business Profile History Report</title>
+	<link rel="icon" href="{% static 'jobs/media/logo.png' %}" type="image/icon type">
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+	<style>
+		.header {
+			background-color: #081c15;
+			color: #fff;
+			padding: 20px;
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+			height: 4%;
+		}
+		.fcc-btn {
+			background-color: #40916c;
+			color: white;
+			border: none;
+			border-radius: 5px;
+			cursor: pointer;
+			text-decoration: none;
+			padding: 10px;
+		}
+	</style>
+</head>
+<body>
+	<div class="header">
+		<div style="padding-left: 2%;"><a class="text-light" href="{% url 'home' %}" style="text-decoration: none; color: aliceblue;">Home</a></div>
+		{% if user.is_authenticated and user.get_business and user.id == business.id %}
+			<div style="float: right;"><a class="fcc-btn" href="{% url 'profile' %}"> My profile</a></div> 
+		{% else %}
+			<div style="float: right;"><a class="fcc-btn" href="{% url 'view-business-profile' business.id%}"> {{business.name}} profile</a></div> 
+		{% endif %}
+	</div>
+	<div class="container mt-5">
+		<h1>Business Profile History Report</h1>
+		<table class="table table-striped">
+			<thead>
+				<tr>
+					<th>Task Name</th>
+					<th>Task Description</th>
+					<th>Completion Time</th>
+					<th>Time Spent</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>Task 1</td>
+					<td>Developed an e-commerce website for a client's online store and integrated payment processing with Stripe.</td>
+					<td>2022-06-01 10:00:00</td>
+					<td>2 hours</td>
+				</tr>
+				<tr>
+					<td>Task 2</td>
+					<td>Developed a mobile application that supports multiple languages, built using React Native.</td>
+					<td>2022-11-02 14:00:00</td>
+					<td>3 hours</td>
+				</tr>
+				<tr>
+					<td>Task 3</td>
+					<td>Designed and built a real-time transportation tracking system for a logistics company, utilizing GPS technology and the Google Maps API.</td>
+					<td>2023-01-05 09:00:00</td>
+					<td>4 hours</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</body>
+</html>
