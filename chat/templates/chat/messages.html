@@ -75,7 +75,11 @@
                                                     <span>{{ thread.second_person.get_business.name }}</span>
                                                 {% endif %}
                                             {% else %}
-                                                <span>{{ thread.first_person.username }}</span>
+                                                {% if thread.first_person.get_freelancer %}
+                                                    <span>{{ thread.first_person.get_freelancer.name }}</span>
+                                                {% else %}
+                                                    <span>{{ thread.first_person.get_business.name }}</span>
+                                                {% endif %}
                                             {% endif %}
 
 {#                                            <p>Kalid is online</p>#}
