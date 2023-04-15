@@ -24,6 +24,7 @@ urlpatterns = [
     path('', include('jobs.urls')),
     path('chat/', include('chat.urls')),
     path('accounts/', include('allauth.urls')),
+    path("invitations/", include('invitations.urls', namespace='invitations')),
 ]
 
 if settings.DEBUG: 

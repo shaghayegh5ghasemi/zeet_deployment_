@@ -69,5 +69,15 @@
 		<h2>New Project</h2>
 		<a href="{% url 'project-create' %}"><button class="employer-button">Create a New Project</button></a>
 	</div>
+	<div class="new-project">
+		<h2>Invite Friends</h2>
+		<form action="{% url 'send-invitation' %}">
+			{% csrf_token %}
+			<div class="input">
+			  <input placeholder="your friend's email" type="text" id="input" name="invitation">
+			</div>
+			<button class="invite-button" type="submit">Invite Friends</button>
+		  </form>
+	</div>
 </body>
 </html>

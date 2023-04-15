@@ -6,6 +6,11 @@ from django.contrib.auth.decorators import login_required
 from .forms import BusinessUpdateForm, FreelancerUpdateForm, ProjectForm
 from django.contrib import messages
 from .filters import *
+from invitations.utils import get_invitation_model
+from django.core.mail import EmailMessage, get_connection
+from django.conf import settings
+
+
 
 def home(request):
     if request.user.is_authenticated:
@@ -59,6 +64,8 @@ def home(request):
         }
         return render(request, 'jobs/home.html', context)
 
+def faq(request):
+    return render(request, 'jobs/FAQ.html')
 
 def FreelancerListViews(request):
     if request.user.is_authenticated:
@@ -153,7 +160,7 @@ def ProjectListViews(request):
 
 class FreelancerCreateView(CreateView):
     model = Freelancer
-    fields = ['name', 'profile_pic', 'skills', 'about', 'certifications']
+    fields = ['name', 'profile_pic', 'skills', 'about']
     success_url = reverse_lazy('home')
 
     def form_valid(self, form):
@@ -179,10 +186,24 @@ def view_business_profile(request, pk):
     return render(request, 'jobs/other_business_profile.html', context)
 
 def view_freelancer_profile(request, pk):
+    # rating = Rating.objects.filter(profile=freelancer, user=request.user).first()
+    # freelancer.user_rating = rating.rating if rating else 0
+
     freelancer = Freelancer.objects.get(id=pk)
+    elligible = False
+    # specify who can rate this freelancer
+    if request.user.is_authenticated:
+        projects = Project.objects.all()
+        if request.user.get_business():
+            for project in projects:
+                if project.owner == request.user.get_business() and project.developer == freelancer:
+                    elligible = True
+                    break
+    # specify who can rate this freelancer
     context = {
         'freelancer': freelancer,
-        'projects': Project.objects.filter(developer=freelancer)
+        'projects': Project.objects.filter(developer=freelancer),
+        'elligible': elligible
     }
 
     return render(request, 'jobs/other_freelancer_profile.html', context)
@@ -204,6 +225,7 @@ def view_project_profile(request, pk):
         'freelancer': freelancer,
         'business': business,
         'project': project,
+        'user': request.user
     }
     return render(request, 'jobs/project_profile.html', context)
 
@@ -227,19 +249,59 @@ def search(request):
 
 def freelancer_report(request, pk):
     freelancer = Freelancer.objects.get(id=pk)
+    
+    projects_id = []
+    all_projects = Project.objects.all()
+    for p in all_projects:
+        if p.developer == freelancer:
+            projects_id.append(p.id)
+
+
+    projects = Project.objects.filter(id__in=projects_id)
+
     context = {
         'freelancer': freelancer,
         'user': request.user,
+        'projects': projects
     }
     return render(request, 'jobs/freelancer_report.html', context)
 
 def business_report(request, pk):
     business = Business.objects.get(id=pk)
+
+    projects_id = []
+    all_projects = Project.objects.all()
+    for p in all_projects:
+        if p.owner == business:
+            projects_id.append(p.id)
+
+    projects = Project.objects.filter(id__in=projects_id)
+
     context = {
         'business': business,
         'user': request.user,
+        'projects': projects
     }
     return render(request, 'jobs/business_report.html', context) # remember to change
+
+def rate(request, profile_id, rating):
+    freelancer = Freelancer.objects.get(id=profile_id)
+    Rating.objects.filter(profile=freelancer, user=request.user).delete()
+    # freelancer.rating_set.create(user=request.user, rating=rating)
+    new_rating = Rating(profile=freelancer, user=request.user, rating=rating)
+    new_rating.save()
+    return view_freelancer_profile(request, profile_id)
+
+def change_status(request, profile_id, project_id, new_status):
+    project = Project.objects.get(id=project_id)
+    if new_status == 0:
+        project.is_complete = False
+        project.save()
+    else:
+        project.is_complete = True
+        project.save()
+    return freelancer_report(request, profile_id)
+    
 
 @login_required
 def handle_login(request):
@@ -318,3 +380,30 @@ def accept_project(request, pk):
     freelancer = request.user.get_freelancer()
     Project.objects.filter(id=pk).update(developer=freelancer)
     return redirect(reverse_lazy('profile'))
+
+def invite(request):
+    Invitation = get_invitation_model()
+    # sender = request.user.email
+    receiver = request.GET.get('invitation')
+    invite = Invitation.create(receiver, inviter=request.user)
+    link = f'http://localhost:8000/invitations/accept-invite/{invite.key}'
+    invite_msg = f'Hello, You ({receiver}) have been invited to join Green Minds. If you would like to join, please go to {link}'
+    subject = 'Invitation to join Green Minds'
+    # send_mail(subject, invite_msg, sender, [receiver, receiver])
+    with get_connection(  
+        host=settings.EMAIL_HOST, 
+        port=settings.EMAIL_PORT,  
+        username=settings.EMAIL_HOST_USER, 
+        password=settings.EMAIL_HOST_PASSWORD, 
+        use_tls=settings.EMAIL_USE_TLS  
+       ) as connection:  
+           subject = subject  
+           email_from = settings.EMAIL_HOST_USER  
+           recipient_list = [receiver, ]  
+           message = invite_msg
+           EmailMessage(subject, message, email_from, recipient_list, connection=connection).send()
+    invite.send_invitation(request)
+    return redirect(reverse_lazy('profile'))
+
+
+

@@ -48,16 +48,32 @@
                                 <li class="{% if forloop.first %}active{% endif %} contact-li" chat-id="chat_{{ thread.id }}" style="cursor: pointer">
                                     <div class="d-flex bd-highlight">
                                         <div class="img_cont">
-                                                {% if receiver.profile_pic %}
-                                                    <img src="{{ receiver.profile_pic.url }}" alt="Profile Picture" class="rounded-circle user_img">
+                                            {% if thread.first_person == user %}
+                                                {% if thread.second_person.get_freelancer.profile_pic  %}
+                                                    <img src="{{  thread.second_person.get_freelancer.profile_pic.url }}" alt="Profile Picture" class="rounded-circle user_img">
+                                                {% elif thread.second_person.get_business.profile_pic  %}
+                                                    <img src="{{  thread.second_person.get_business.profile_pic.url }}" alt="Profile Picture" class="rounded-circle user_img">
                                                 {% else %}
                                                     <img src="{% static 'jobs/media/profile_pic.png' %}" alt="Profile Picture" class="rounded-circle user_img">
                                                 {% endif %}
+                                            {% else %}
+                                                {% if thread.first_person.get_freelancer.profile_pic  %}
+                                                    <img src="{{  thread.first_person.get_freelancer.profile_pic.url }}" alt="Profile Picture" class="rounded-circle user_img">
+                                                {% elif thread.second_person.get_business.profile_pic  %}
+                                                    <img src="{{  thread.first_person.get_business.profile_pic.url }}" alt="Profile Picture" class="rounded-circle user_img" >
+                                                {% else %}
+                                                    <img src="{% static 'jobs/media/profile_pic.png' %}" alt="Profile Picture" class="rounded-circle user_img">
+                                                {% endif %}
+                                            {% endif %}
                                             <span class="online_icon"></span>
                                         </div>
                                         <div class="user_info">
                                             {% if thread.first_person == user %}
-                                                <span>{{ thread.second_person.username }}</span>
+                                                {% if thread.second_person.get_freelancer %}
+                                                    <span>{{ thread.second_person.get_freelancer.name }}</span>
+                                                {% else %}
+                                                    <span>{{ thread.second_person.get_business.name }}</span>
+                                                {% endif %}
                                             {% else %}
                                                 <span>{{ thread.first_person.username }}</span>
                                             {% endif %}
@@ -84,15 +100,19 @@
                                 <div class="card-header msg_head">
                                     <div class="d-flex bd-highlight">
                                         <div class="img_cont">
-                                            {% if receiver.get_business %}
-                                                {% if receiver.get_business.profile_pic %}
-                                                    <img src="{{ receiver.get_business.profile_pic.url }}" alt="Profile Picture" class="rounded-circle user_img">
+                                            {% if thread.first_person == user %}
+                                                {% if thread.second_person.get_freelancer.profile_pic  %}
+                                                    <img src="{{  thread.second_person.get_freelancer.profile_pic.url }}" alt="Profile Picture" class="rounded-circle user_img">
+                                                {% elif thread.second_person.get_business.profile_pic  %}
+                                                    <img src="{{  thread.second_person.get_business.profile_pic.url }}" alt="Profile Picture" class="rounded-circle user_img">
                                                 {% else %}
                                                     <img src="{% static 'jobs/media/profile_pic.png' %}" alt="Profile Picture" class="rounded-circle user_img">
                                                 {% endif %}
                                             {% else %}
-                                                {% if receiver.get_freelancer.profile_pic %}
-                                                    <img src="{{ receiver.get_freelancer.profile_pic.url }}" alt="Profile Picture" class="rounded-circle user_img">
+                                                {% if thread.first_person.get_freelancer.profile_pic  %}
+                                                    <img src="{{  thread.first_person.get_freelancer.profile_pic.url }}" alt="Profile Picture" class="rounded-circle user_img">
+                                                {% elif thread.second_person.get_business.profile_pic  %}
+                                                    <img src="{{  thread.first_person.get_business.profile_pic.url }}" alt="Profile Picture" class="rounded-circle user_img" >
                                                 {% else %}
                                                     <img src="{% static 'jobs/media/profile_pic.png' %}" alt="Profile Picture" class="rounded-circle user_img">
                                                 {% endif %}
@@ -101,9 +121,17 @@
                                         </div>
                                         <div class="user_info">
                                             {% if thread.first_person == user %}
-                                                    <span>Chat with {{ thread.second_person.username }}</span>
+                                                {% if thread.second_person.get_business %}
+                                                    <span>Chat with {{ thread.second_person.get_business.name }}</span>
+                                                {% else %}
+                                                    <span>Chat with {{ thread.second_person.get_freelancer.name }}</span>
+                                                {% endif %}
                                             {% else %}
-                                                <span>Chat with {{ thread.first_person.username }}</span>
+                                                {% if thread.first_person.get_business %}
+                                                    <span>Chat with {{ thread.first_person.get_business.name }}</span>
+                                                {% else %}
+                                                    <span>Chat with {{ thread.first_person.get_freelancer.name }}</span>
+                                                {% endif %}
                                             {% endif %}
 
                                             <p>{{ thread.chatmessage_thread.all.count }} messages</p>
@@ -134,17 +162,21 @@
                                                     <span class="msg_time_send">{{ chat.timestamp|date:"d D" }}, {{ chat.timestamp|time:"H:i" }}</span>
                                                 </div>
                                             <div class="img_cont_msg">
-                                                {% if sender.get_business %}
-                                                    {% if sender.get_business.profile_pic %}
-                                                    <img src="{{ sender.get_business.profile_pic.url }}" alt="Profile Picture" class="rounded-circle user_img_msg">
+                                                {% if thread.first_person == user %}
+                                                    {% if thread.first_person.get_freelancer.profile_pic  %}
+                                                        <img src="{{  thread.first_person.get_freelancer.profile_pic.url }}" alt="Profile Picture" class="rounded-circle user_img" style="max-width: 50px; max-height: 50px;">
+                                                    {% elif thread.second_person.get_business.profile_pic  %}
+                                                        <img src="{{  thread.first_person.get_business.profile_pic.url }}" alt="Profile Picture" class="rounded-circle user_img" >
                                                     {% else %}
-                                                    <img src="{% static 'jobs/media/profile_pic.png' %}" alt="Profile Picture" class="rounded-circle user_img_msg">
+                                                        <img src="{% static 'jobs/media/profile_pic.png' %}" alt="Profile Picture" class="rounded-circle user_img" style="max-width: 50px; max-height: 50px;">
                                                     {% endif %}
                                                 {% else %}
-                                                    {% if sender.get_freelancer.profile_pic %}
-                                                    <img src="{{ sender.get_freelancer.profile_pic.url }}" alt="Profile Picture" class="rounded-circle user_img_msg">
+                                                    {% if thread.second_person.get_freelancer.profile_pic  %}
+                                                        <img src="{{  thread.second_person.get_freelancer.profile_pic.url }}" alt="Profile Picture" class="rounded-circle user_img" style="max-width: 50px; max-height: 50px;">
+                                                    {% elif thread.second_person.get_business.profile_pic  %}
+                                                        <img src="{{  thread.second_person.get_business.profile_pic.url }}" alt="Profile Picture" class="rounded-circle user_img" style="max-width: 50px; max-height: 50px;">
                                                     {% else %}
-                                                    <img src="{% static 'jobs/media/profile_pic.png' %}" alt="Profile Picture" class="rounded-circle user_img_msg">
+                                                        <img src="{% static 'jobs/media/profile_pic.png' %}" alt="Profile Picture" class="rounded-circle user_img" style="max-width: 50px; max-height: 50px;">
                                                     {% endif %}
                                                 {% endif %}
                                             </div>
@@ -152,19 +184,23 @@
                                         {% else %}
                                             <div class="d-flex mb-4 received">
                                             <div class="img_cont_msg">
-                                                {% if receiver.get_business %}
-                                                {% if receiver.get_business.profile_pic %}
-                                                    <img src="{{ receiver.get_business.profile_pic.url }}" alt="Profile Picture" class="rounded-circle user_img_msg">
-                                                {% else %}
-                                                    <img src="{% static 'jobs/media/profile_pic.png' %}" alt="Profile Picture" class="rounded-circle user_img_msg">
-                                                {% endif %}
-                                                {% else %}
-                                                    {% if receiver.get_freelancer.profile_pic %}
-                                                        <img src="{{ receiver.get_freelancer.profile_pic.url }}" alt="Profile Picture" class="rounded-circle user_img_msg">
+                                                {% if thread.first_person == user %}
+                                                    {% if thread.second_person.get_freelancer.profile_pic  %}
+                                                        <img src="{{  thread.second_person.get_freelancer.profile_pic.url }}" alt="Profile Picture" class="rounded-circle user_img" style="max-width: 50px; max-height: 50px;">
+                                                    {% elif thread.second_person.get_business.profile_pic  %}
+                                                        <img src="{{  thread.second_person.get_business.profile_pic.url }}" alt="Profile Picture" class="rounded-circle user_img" style="max-width: 50px; max-height: 50px;">
                                                     {% else %}
-                                                        <img src="{% static 'jobs/media/profile_pic.png' %}" alt="Profile Picture" class="rounded-circle user_img_msg">
+                                                        <img src="{% static 'jobs/media/profile_pic.png' %}" alt="Profile Picture" class="rounded-circle user_img" style="max-width: 50px; max-height: 50px;">
                                                     {% endif %}
-                                                {% endif %}
+                                                {% else %}
+                                                    {% if thread.first_person.get_freelancer.profile_pic  %}
+                                                        <img src="{{  thread.first_person.get_freelancer.profile_pic.url }}" alt="Profile Picture" class="rounded-circle user_img" style="max-width: 50px; max-height: 50px;">
+                                                    {% elif thread.second_person.get_business.profile_pic  %}
+                                                        <img src="{{  thread.first_person.get_business.profile_pic.url }}" alt="Profile Picture" class="rounded-circle user_img" >
+                                                    {% else %}
+                                                        <img src="{% static 'jobs/media/profile_pic.png' %}" alt="Profile Picture" class="rounded-circle user_img" style="max-width: 50px; max-height: 50px;">
+                                                    {% endif %}
+                                                    {% endif %}
                                             </div>
                                             <div class="msg_cotainer">
                                                 {{ chat.message }}

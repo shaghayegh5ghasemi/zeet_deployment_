@@ -3,8 +3,10 @@
 <html>
 <head>
 	<title>{{freelancer.name}}</title>
-    <link rel="icon" href="{% static 'jobs/media/logo.png' %}" type="image/icon type">
+  <link rel="icon" href="{% static 'jobs/media/logo.png' %}" type="image/icon type">
 	<link rel="stylesheet" type="text/css" href="{% static 'jobs/css/freelancer.css' %}">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 <body>
     <div class="header">
@@ -16,13 +18,45 @@
       <div class="profile-section">
         <h2>Profile Picture</h2>
         {% if freelancer.profile_pic %}
-        <img src="{{ freelancer.profile_pic.url }}" alt="Profile Picture" class="profile-picture">
-    		<div style="padding-bottom: 1%"><a style="color: white; background-color: #2d6a4f;" class="fcc-btn" href="{% url 'messages-to' freelancer.owner.id %}">Message</a></div>
+          <img src="{{ freelancer.profile_pic.url }}" alt="Profile Picture" class="profile-picture">
+		      {% if user.is_authenticated %}
+    		    <div style="padding-bottom: 1%"><a style="color: white; background-color: #2d6a4f;" class="fcc-btn" href="{% url 'messages-to' freelancer.owner.id %}">Message</a></div>
+          {% endif %}
         {% else %}
-        <img src="{% static 'jobs/media/profile_pic.png' %}" alt="Profile Picture" class="profile-picture">
-    		<div style="padding-bottom: 1%"><a style="color: white; background-color: #2d6a4f;" class="fcc-btn" href="{% url 'messages-to' freelancer.owner.id %}">Message</a></div>
+          <img src="{% static 'jobs/media/profile_pic.png' %}" alt="Profile Picture" class="profile-picture">
+          {% if user.is_authenticated %}
+            <div style="padding-bottom: 1%"><a style="color: white; background-color: #2d6a4f;" class="fcc-btn" href="{% url 'messages-to' freelancer.owner.id %}">Message</a></div>
+          {% endif %}
         {% endif %}
       </div>
+
+      <div class="profile-section">
+        <h2>Avg rating</h2>
+        <div class="card-body">
+          <h5 class="card-title">
+            <span class="fa fa-star {% if freelancer.average_rating > 0 %} checked {% endif %}"></span>
+            <span class="fa fa-star {% if freelancer.average_rating > 1 %} checked {% endif %}"></span>
+            <span class="fa fa-star {% if freelancer.average_rating > 2 %} checked {% endif %}"></span>
+            <span class="fa fa-star {% if freelancer.average_rating > 3 %} checked {% endif %}" ></span>
+            <span class="fa fa-star {% if freelancer.average_rating > 4 %} checked {% endif %}"></span>
+          </h5>
+          {% if elligible %}
+          <ul class="btn btn-light list-inline rating-list">
+            <li onclick="rate(5, {{freelancer.id}})">
+              <i class="fa fa-star {% if freelancer.user_rating > 4 %} checked {% endif %}" title="Rate 5"></i></li>
+            <li onclick="rate(4, {{freelancer.id}})">
+                <i class="fa fa-star {% if freelancer.user_rating > 3 %} checked {% endif %}" title="Rate 4"></i></li>
+            <li onclick="rate(3, {{freelancer.id}})">
+                <i class="fa fa-star {% if freelancer.user_rating > 2 %} checked {% endif %}" title="Rate 3"></i></li>
+            <li onclick="rate(2, {{freelancer.id}})">
+                <i class="fa fa-star {% if freelancer.user_rating > 1 %} checked {% endif %}" title="Rate 2"></i></li>
+            <li onclick="rate(1, {{freelancer.id}})">
+                <i class="fa fa-star {% if freelancer.user_rating > 0 %} checked {% endif %}" title="Rate 1"></i></li>
+          </ul>
+          {% endif %}
+        </div>
+      </div>
+
       <div class="profile-section">
         <h2>Username</h2>
         <p>{{ freelancer.name }}</p>
@@ -31,17 +65,7 @@
         <h2>E-mail: </h2>
         <p>{{ freelancer.owner.email }}</p>
       </div>
-      <div class="profile-section">
-        <h2>Score</h2>
-        <div class="star-rating">
-          <span class="fa fa-star checked"></span>
-          <span class="fa fa-star checked"></span>
-          <span class="fa fa-star checked"></span>
-          <span class="fa fa-star"></span>
-          <span class="fa fa-star"></span>
-        </div>
-        <p> {{ freelancer.rate }} </p>
-      </div>
+
       <div class="profile-section">
         <h2>Projects</h2>
         {% if projects|length > 3 %}
@@ -70,17 +94,18 @@
         <h2>About Me</h2>
         <p>{{freelancer.about}}</p>
       </div>
-      <!-- <div class="profile-section">
-        <h2>Certifications</h2>
-        <p>{{ freelancer.certifications}}</p>
-      </div> -->
-
-      <!-- <div class="profile-section">
-        <button class="invite-button">Invite Friends</button>
-      </div>
-      <div class="profile-section">
-        <button class="my-dashboard">My Dashboard</button>
-      </div> -->
     </div>
+    <script>
+      const rate = (rating, profile_id) => {
+          fetch(`/rate/${profile_id}/${rating}/`, {
+              method: 'GET',
+              headers: {
+                  'Content-Type': 'application/json'
+              }
+          }).then(rest => {
+              window.location.reload();
+          })
+      }
+    </script>
   </body>
-  
+  </html>

@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure--pcb=lmqq4$&uu4#5w!_%kklb#0n9h9oolx#te#!^2pj#+4-)-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 SITE_ID = 1
 # Application definition
@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django_filters',
 
 
+
     #local apps
     'jobs',
     'accounts',
@@ -53,6 +54,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.facebook',
     'allauth.socialaccount.providers.google',
+    'invitations',
 
     #third party apps
     'crispy_forms',
@@ -204,7 +206,7 @@ ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_UNIQUE_EMAIL = True
-ACCOUNT_SESSION_REMEMBER = True
+ACCOUNT_SESSION_REMEMBER = False
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap4"
 CRISPY_TEMPLATE_PACK = "bootstrap4"
@@ -218,3 +220,20 @@ CHANNEL_LAYERS = {
         # }
     }
 }
+
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_USE_TLS = False
+EMAIL_PORT = 465
+EMAIL_USE_SSL = True
+EMAIL_HOST_USER = 'shaghayegh5ghasemi@gmail.com'
+EMAIL_HOST_PASSWORD = 'ahvxvizgicxnlnaa'
+
+
+INVITATION_EXPIRY = 1
+ACCEPT_INVITE_AFTER_SIGNUP = True
+ACCOUNT_ADAPTER = 'invitations.models.InvitationsAdapter'
+
+
+TIME_ZONE = 'America/Montreal'
