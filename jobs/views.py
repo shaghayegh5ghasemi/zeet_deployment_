@@ -386,7 +386,7 @@ def invite(request):
     # sender = request.user.email
     receiver = request.GET.get('invitation')
     invite = Invitation.create(receiver, inviter=request.user)
-    link = f'http://localhost:8000/invitations/accept-invite/{invite.key}'
+    link = f'http://34.217.45.96:8000/invitations/accept-invite/{invite.key}'
     invite_msg = f'Hello, You ({receiver}) have been invited to join Green Minds. If you would like to join, please go to {link}'
     subject = 'Invitation to join Green Minds'
     # send_mail(subject, invite_msg, sender, [receiver, receiver])
